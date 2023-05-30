@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <unistd.h>
+#include <ctime>
 #include <cstdlib>
 using namespace std;
 
@@ -21,9 +22,9 @@ public:
     int CopperOre = 0;
 
     void Eat() {
-        if (Food >= 5) {
-            Food -= 5;
-            Hunger += 5;
+        if (Food >= 1) {
+            Food -= 1;
+            Hunger += 1;
             cout << "You ate some food." << endl;
         } else {
             cout << "You don't have enough food to eat." << endl;
@@ -36,6 +37,7 @@ public:
     	std::cout << "Speed: " << Speed << endl;
     	std::cout << "Money: " << Money << endl;
     	std::cout << "Fatigue: " << Fatigue << endl;
+        std::cout << "Hunger: " << Hunger << endl;
     }
 
     void Inventory(){
@@ -59,6 +61,9 @@ public:
     void Mine() {
     cout << "You start to mine..." << endl;
     sleep(10);
+
+    srand(static_cast<unsigned int>(time(nullptr)));
+
     int rocksMined = rand() % 10 + 1;
     int coalMined = rand() % 5 + 1;
     int copperOreMined = rand() % 3 + 1;
@@ -69,13 +74,14 @@ public:
     CopperOre += copperOreMined;
     IronOre += ironOreMined;
     Fatigue += 1;
+    Hunger -= 1;
 
     cout << "Mining Results:" << endl;
     cout << "Rocks mined: " << rocksMined << endl;
     cout << "Coal mined: " << coalMined << endl;
     cout << "Copper ore mined: " << copperOreMined << endl;
     cout << "Iron ore mined: " << ironOreMined << endl;
-    cout << "Fatigue increased by 1." << endl;
+    cout << "Fatigue increased by 1 and hunger dropped by 1." << endl;
 }
 
 void Sell() {
@@ -152,6 +158,42 @@ void Sell() {
             break;
     }
 }
+
+void Shop(){
+    cout << "Welcome to the shop! Enter" << endl;
+    cout << "[1] Buy food" << endl;
+    cout << "[2] Quit" << endl;
+
+    int choice;
+    cin >> choice;
+
+    switch (choice) {
+        case 1:
+            cout << "Enter the quantity of food you want to buy: ";
+            int quantity;
+            cin >> quantity;
+            if (quantity > 0) {
+                int totalPrice = quantity * 50;
+                if (Money >= totalPrice) {
+                    Money -= totalPrice;
+                    Food += quantity;
+                    cout << "You bought " << quantity << " food for " << totalPrice << " money." << endl;
+                } else {
+                    cout << "You don't have enough money to buy that many food." << endl;
+                }
+            } else {
+                cout << "Invalid quantity. Please try again." << endl;
+            }
+            break;
+        case 2:
+            cout << "Exiting shop." << endl;
+            break;
+        default:
+            cout << "Invalid choice. Please try again." << endl;
+            break;
+    }
+}
+
 };
 
 void processCommand(const string& command, Player& player) {
@@ -164,6 +206,7 @@ void processCommand(const string& command, Player& player) {
         cout << "[*] Sell" << endl;
         cout << "[*] Info" << endl;
         cout << "[*] Inventory" << endl;
+        cout << "[*] Shop" << endl;
         // Add code to handle the 'help' command
     } else if (command == "Quit") {
         cout << "Quit command executed. Exiting program." << endl;
@@ -181,6 +224,8 @@ void processCommand(const string& command, Player& player) {
     	player.Mine();
     } else if (command == "Sell"){
         player.Sell();
+    } else if (command == "Shop"){
+        player.Shop();
     } else {
         cout << "Unknown command: " << command << endl;
     }
