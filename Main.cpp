@@ -1,5 +1,21 @@
 //build with "g++ -o Game Main.cpp"
 
+/*TODO:
+
+[-] Add better UI
+
+[+] Mining update
+
+[-] Combat probably
+
+[-] More ways to gain stats
+
+[+] Cls command
+
+[-] Save game
+
+*/
+
 #include <iostream>
 #include <string>
 #include <unistd.h>
@@ -20,6 +36,9 @@ public:
     int Coal = 0;
     int IronOre = 0;
     int CopperOre = 0;
+    int MiningLevel = 0;
+    float MiningXp = 0;
+    float MiningXpNeeded = 100;
 
     void Eat() {
         if (Food >= 1) {
@@ -38,6 +57,9 @@ public:
     	std::cout << "Money: " << Money << endl;
     	std::cout << "Fatigue: " << Fatigue << endl;
         std::cout << "Hunger: " << Hunger << endl;
+        std::cout << "Mining level: " << MiningLevel << "/99" << endl;
+        std::cout << "Mining XP: " << MiningXp << "/" << MiningXpNeeded << endl;
+
     }
 
     void Inventory(){
@@ -58,31 +80,58 @@ public:
     		cout << "" << endl;
     	}
     }
-    void Mine() {
+void Mine() {
     cout << "You start to mine..." << endl;
     sleep(10);
 
     srand(static_cast<unsigned int>(time(nullptr)));
 
     int rocksMined = rand() % 10 + 1;
-    int coalMined = rand() % 5 + 1;
-    int copperOreMined = rand() % 3 + 1;
-    int ironOreMined = rand() % 2 + 1;
+    int coalMined = 0;
+    int copperOreMined = 0;
+    int ironOreMined = 0;
+
+    if (MiningLevel >= 3)
+        coalMined = rand() % 5 + 1;
+    if (MiningLevel >= 5)
+        copperOreMined = rand() % 3 + 1;
+    if (MiningLevel >= 10)
+        ironOreMined = rand() % 2 + 1;
 
     Rocks += rocksMined;
-    Coal += coalMined;
-    CopperOre += copperOreMined;
-    IronOre += ironOreMined;
+    MiningXp += rocksMined;
+
+    if (MiningLevel >= 3) {
+        Coal += coalMined;
+        MiningXp += coalMined;
+    }
+    if (MiningLevel >= 5) {
+        CopperOre += copperOreMined;
+        MiningXp += copperOreMined;
+    }
+    if (MiningLevel >= 10) {
+        IronOre += ironOreMined;
+        MiningXp += ironOreMined;
+    }
     Fatigue += 1;
     Hunger -= 1;
 
     cout << "Mining Results:" << endl;
     cout << "Rocks mined: " << rocksMined << endl;
-    cout << "Coal mined: " << coalMined << endl;
-    cout << "Copper ore mined: " << copperOreMined << endl;
-    cout << "Iron ore mined: " << ironOreMined << endl;
+    if (MiningLevel >= 3)
+        cout << "Coal mined: " << coalMined << endl;
+    if (MiningLevel >= 5)
+        cout << "Copper ore mined: " << copperOreMined << endl;
+    if (MiningLevel >= 10)
+        cout << "Iron ore mined: " << ironOreMined << endl;
     cout << "Fatigue increased by 1 and hunger dropped by 1." << endl;
+    cout << "You gained " << rocksMined + coalMined + copperOreMined + ironOreMined << " XP from the mining trip." << endl;
+
+    if (MiningXp >= MiningXpNeeded) {
+        MiningLevelUp();
+    }
 }
+
 
 void Sell() {
     cout << "Your inventory: " << endl;
@@ -194,6 +243,18 @@ void Shop(){
     }
 }
 
+void Cls(){
+    system("cls");
+}
+
+void MiningLevelUp() {
+        MiningLevel += 1;
+        MiningXp -= MiningXpNeeded;
+        MiningXpNeeded *= 1.2;
+        cout << "Congratulations! You leveled up Mining to Level " << MiningLevel << "!" << endl;
+        cout << "XP needed for next level: " << MiningXpNeeded << endl;
+    }
+
 };
 
 void processCommand(const string& command, Player& player) {
@@ -207,6 +268,7 @@ void processCommand(const string& command, Player& player) {
         cout << "[*] Info" << endl;
         cout << "[*] Inventory" << endl;
         cout << "[*] Shop" << endl;
+        cout << "[*] Cls" << endl;
         // Add code to handle the 'help' command
     } else if (command == "Quit") {
         cout << "Quit command executed. Exiting program." << endl;
@@ -226,6 +288,8 @@ void processCommand(const string& command, Player& player) {
         player.Sell();
     } else if (command == "Shop"){
         player.Shop();
+    } else if (command == "Cls"){
+        player.Cls();
     } else {
         cout << "Unknown command: " << command << endl;
     }
@@ -234,6 +298,7 @@ void processCommand(const string& command, Player& player) {
 
 int main(int argc, char const* argv[]) {
     Player player;
+
 
     string command;
     while (true) {
