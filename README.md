@@ -5,13 +5,11 @@ Some console game im developing in my spare time :p  use the command "Help" to g
 
 [-] Add better UI
 
-[-] Leveling system
+[+] Mining update
 
 [-] Combat probably
 
 [-] More ways to gain stats
-
-[-] Comment code
 
 [+] Cls command
 
