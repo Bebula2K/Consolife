@@ -3,10 +3,16 @@ Some console game im developing in my spare time :p  use the command "Help" to g
 
 //TODO:
 
-Add better UI
+[-] Add better UI
 
-Leveling system
+[-] Leveling system
 
-Combat probably
+[-] Combat probably
 
-More ways to gain stats
+[-] More ways to gain stats
+
+[-] Comment code
+
+[+] Cls command
+
+[-] Save game
