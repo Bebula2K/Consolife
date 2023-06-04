@@ -3,7 +3,7 @@ Some console game im developing in my spare time :p  use the command "Help" to g
 
 //TODO:
 
-[-] Add better UI
+[+] Add better UI
 
 [+] Mining update
 
