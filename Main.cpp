@@ -17,10 +17,12 @@
 */
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <unistd.h>
 #include <ctime>
 #include <cstdlib>
+#include <csignal>
 using namespace std;
 
 // ANSI escape codes for text colors
@@ -30,6 +32,12 @@ using namespace std;
 #define YELLOW  "\033[33m"
 #define BLUE    "\033[34m"
 
+bool shouldExit = false;
+
+void signalHandler(int signum) {
+    cout << "Received termination signal. Exiting program." << endl;
+    shouldExit = true;
+}
 
 class Player {
 public:
@@ -268,6 +276,53 @@ void MiningLevelUp() {
         cout << "XP needed for next level: " << MiningXpNeeded << endl;
     }
 
+void saveGame() {
+        ofstream saveFile("save.txt");
+        if (saveFile.is_open()) {
+            saveFile << Intelligence << "\n";
+            saveFile << Strength << "\n";
+            saveFile << Hunger << "\n";
+            saveFile << Fatigue << "\n";
+            saveFile << Money << "\n";
+            saveFile << Food << "\n";
+            saveFile << Rocks << "\n";
+            saveFile << Coal << "\n";
+            saveFile << IronOre << "\n";
+            saveFile << CopperOre << "\n";
+            saveFile << MiningLevel << "\n";
+            saveFile << MiningXp << "\n";
+            saveFile << MiningXpNeeded << "\n";
+            saveFile.close();
+            cout << "Game saved successfully." << endl;
+        } else {
+            cout << "Failed to save the game." << endl;
+        }
+    }
+
+void loadGame() {
+        ifstream saveFile("save.txt");
+        if (saveFile.is_open()) {
+            saveFile >> Intelligence;
+            saveFile >> Strength;
+            saveFile >> Hunger;
+            saveFile >> Fatigue;
+            saveFile >> Money;
+            saveFile >> Food;
+            saveFile >> Rocks;
+            saveFile >> Coal;
+            saveFile >> IronOre;
+            saveFile >> CopperOre;
+            saveFile >> MiningLevel;
+            saveFile >> MiningXp;
+            saveFile >> MiningXpNeeded;
+            saveFile.close();
+            cout << "Game loaded successfully." << endl;
+        } else {
+            cout << "Failed to load the game. Starting a new game." << endl;
+        }
+    }
+
+
 };
 
 void processCommand(const string& command, Player& player) {
@@ -282,6 +337,8 @@ void processCommand(const string& command, Player& player) {
         cout << "[" << GREEN << "*" << RESET << "] Inventory" << endl;
         cout << "[" << GREEN << "*" << RESET << "] Shop" << endl;
         cout << "[" << GREEN << "*" << RESET << "] Cls" << endl;
+        cout << "[" << GREEN << "*" << RESET << "] Save" << endl;
+        cout << "[" << GREEN << "*" << RESET << "] Load" << endl;
         // Add code to handle the 'help' command
     } else if (command == "Quit") {
         cout << "Quit command executed. Exiting program." << endl;
@@ -303,6 +360,10 @@ void processCommand(const string& command, Player& player) {
         player.Shop();
     } else if (command == "Cls"){
         player.Cls();
+    } else if(command == "Save"){
+        player.saveGame();
+    } else if (command == "Load"){
+        player.loadGame();
     } else {
         cout << "Unknown command: " << command << endl;
     }
@@ -311,10 +372,12 @@ void processCommand(const string& command, Player& player) {
 
 int main(int argc, char const* argv[]) {
     Player player;
-
-
     string command;
-    while (true) {
+
+    // Register the signal handler for SIGINT
+    signal(SIGINT, signalHandler);
+
+    while (!shouldExit) { // Check the shouldExit flag in the loop condition
         cout << "> ";
         getline(cin, command);
 
