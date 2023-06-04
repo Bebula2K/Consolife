@@ -4,7 +4,7 @@
 
 [-] Add better UI
 
-[+] Mining update
+[+] Leveling system
 
 [-] Combat probably
 
@@ -23,11 +23,18 @@
 #include <cstdlib>
 using namespace std;
 
+// ANSI escape codes for text colors
+#define RESET   "\033[0m"
+#define RED     "\033[31m"
+#define GREEN   "\033[32m"
+#define YELLOW  "\033[33m"
+#define BLUE    "\033[34m"
+
+
 class Player {
 public:
     int Intelligence = 0;
     int Strength = 0;
-    int Speed = 0;
     float Hunger = 100;
     int Fatigue = 0;
     float Money = 0;
@@ -51,23 +58,22 @@ public:
     }
 
     void Info(){
-    	std::cout << "Intelligence: " << Intelligence << endl;
-    	std::cout << "Strength: " << Strength << endl;
-    	std::cout << "Speed: " << Speed << endl;
-    	std::cout << "Money: " << Money << endl;
-    	std::cout << "Fatigue: " << Fatigue << endl;
-        std::cout << "Hunger: " << Hunger << endl;
-        std::cout << "Mining level: " << MiningLevel << "/99" << endl;
-        std::cout << "Mining XP: " << MiningXp << "/" << MiningXpNeeded << endl;
+    	std::cout << "Intelligence " << "  |   " << YELLOW << Intelligence << "/99" << RESET << endl;
+    	std::cout << "Strength " << "      |   " << YELLOW << Strength << "/99" << RESET << endl;
+        std::cout << "Mining level " << "  |   " << YELLOW << MiningLevel << "/99" << RESET << endl;
+        std::cout << "Mining XP " << "     |   " << YELLOW << MiningXp << "/" << MiningXpNeeded << RESET << endl;
+        std::cout << "Money " << "         |   " << YELLOW << Money << RESET << endl;
+    	std::cout << "Fatigue " << "       |   " << YELLOW << Fatigue << RESET << endl;
+        std::cout << "Hunger " << "        |   " << YELLOW << Hunger << RESET << endl;
 
     }
 
     void Inventory(){
-    	std::cout << "Food: " << Food << endl;
-    	std::cout << "Rocks: " << Rocks << endl;
-    	std::cout << "Coal: " << Coal << endl;
-    	std::cout << "Copper Ore: " << CopperOre << endl;
-    	std::cout << "Iron Ore: " << IronOre << endl;
+    	std::cout << "Food " << "          |   " << YELLOW << Food << RESET << endl;
+    	std::cout << "Rocks " << "         |   " << YELLOW << Rocks << RESET << endl;
+    	std::cout << "Coal " << "          |   " << YELLOW << Coal << RESET << endl;
+    	std::cout << "Copper Ore " << "    |   " << YELLOW << CopperOre << RESET << endl;
+    	std::cout << "Iron Ore " << "      |   " << YELLOW << IronOre << RESET << endl;
     }
 
     void PlayerSleep(){
@@ -81,8 +87,15 @@ public:
     	}
     }
 void Mine() {
-    cout << "You start to mine..." << endl;
-    sleep(10);
+    cout << "Mining in progress";
+    cout.flush();
+    for (int i = 0; i < 10; i++) {
+        cout << ".";
+        cout.flush();
+        sleep(1);
+    }
+    cout << endl;
+    
 
     srand(static_cast<unsigned int>(time(nullptr)));
 
@@ -117,15 +130,15 @@ void Mine() {
     Hunger -= 1;
 
     cout << "Mining Results:" << endl;
-    cout << "Rocks mined: " << rocksMined << endl;
+    cout << "Rocks mined: " << YELLOW << rocksMined << RESET << endl;
     if (MiningLevel >= 3)
-        cout << "Coal mined: " << coalMined << endl;
+        cout << "Coal mined: " << YELLOW << coalMined << RESET << endl;
     if (MiningLevel >= 5)
-        cout << "Copper ore mined: " << copperOreMined << endl;
+        cout << "Copper ore mined: " << YELLOW << copperOreMined << RESET << endl;
     if (MiningLevel >= 10)
-        cout << "Iron ore mined: " << ironOreMined << endl;
-    cout << "Fatigue increased by 1 and hunger dropped by 1." << endl;
-    cout << "You gained " << rocksMined + coalMined + copperOreMined + ironOreMined << " XP from the mining trip." << endl;
+        cout << "Iron ore mined: " << YELLOW << ironOreMined << RESET << endl;
+    cout << "Fatigue increased by" << YELLOW << " 1 " << RESET << "and hunger dropped by" << YELLOW << " 1" << RESET << endl;
+    cout << "You gained " << GREEN << rocksMined + coalMined + copperOreMined + ironOreMined << RESET << " XP from the mining trip." << endl;
 
     if (MiningXp >= MiningXpNeeded) {
         MiningLevelUp();
@@ -135,11 +148,11 @@ void Mine() {
 
 void Sell() {
     cout << "Your inventory: " << endl;
-    cout << "[1] Food: " << Food << endl;
-    cout << "[2] Rocks: " << Rocks << endl;
-    cout << "[3] Coal: " << Coal << endl;
-    cout << "[4] Copper Ore: " << CopperOre << endl;
-    cout << "[5] Iron Ore: " << IronOre << endl;
+    cout << "[" << GREEN << "1" << RESET << "] Food: " << YELLOW << Food << RESET << endl;
+    cout << "[" << GREEN << "2" << RESET << "] Rocks: " << YELLOW << Rocks << RESET << endl;
+    cout << "[" << GREEN << "3" << RESET << "] Coal: " << YELLOW << Coal << RESET << endl;
+    cout << "[" << GREEN << "4" << RESET << "] Copper Ore: " << YELLOW << CopperOre << RESET << endl;
+    cout << "[" << GREEN << "5" << RESET << "] Iron Ore: " << YELLOW << IronOre << RESET << endl;
 
     cout << "What would you like to sell? Enter the corresponding number (1-5): ";
     int choice;
@@ -153,7 +166,7 @@ void Sell() {
             if (quantity > 0 && quantity <= Food) {
                 Money += quantity * 3;
                 Food -= quantity;
-                cout << "You sold " << quantity << " food for " << quantity * 3 << " money." << endl;
+                cout << "You sold " << YELLOW << quantity << RESET << " food for " << GREEN << quantity * 3 << RESET << " money." << endl;
             } else {
                 cout << "Invalid quantity. Please try again." << endl;
             }
@@ -164,7 +177,7 @@ void Sell() {
             if (quantity > 0 && quantity <= Rocks) {
                 Money += quantity;
                 Rocks -= quantity;
-                cout << "You sold " << quantity << " rocks for " << quantity << " money." << endl;
+                cout << "You sold " << YELLOW << quantity << RESET << " rocks for " << GREEN << quantity << RESET << " money." << endl;
             } else {
                 cout << "Invalid quantity. Please try again." << endl;
             }
@@ -175,7 +188,7 @@ void Sell() {
             if (quantity > 0 && quantity <= Coal) {
                 Money += quantity * 5;
                 Coal -= quantity;
-                cout << "You sold " << quantity << " coal for " << quantity * 5 << " money." << endl;
+                cout << "You sold " << YELLOW << quantity << RESET << " coal for " << GREEN << quantity * 5 << RESET << " money." << endl;
             } else {
                 cout << "Invalid quantity. Please try again." << endl;
             }
@@ -186,7 +199,7 @@ void Sell() {
             if (quantity > 0 && quantity <= CopperOre) {
                 Money += quantity * 10;
                 CopperOre -= quantity;
-                cout << "You sold " << quantity << " copper ore for " << quantity * 10 << " money." << endl;
+                cout << "You sold " << YELLOW << quantity << RESET << " copper ore for " << GREEN << quantity * 10 << RESET << " money." << endl;
             } else {
                 cout << "Invalid quantity. Please try again." << endl;
             }
@@ -197,7 +210,7 @@ void Sell() {
             if (quantity > 0 && quantity <= IronOre) {
                 Money += quantity * 15;
                 IronOre -= quantity;
-                cout << "You sold " << quantity << " iron ore for " << quantity * 15 << " money." << endl;
+                cout << "You sold " << YELLOW << quantity << RESET << " iron ore for " << GREEN << quantity * 15 << RESET << " money." << endl;
             } else {
                 cout << "Invalid quantity. Please try again." << endl;
             }
@@ -210,8 +223,8 @@ void Sell() {
 
 void Shop(){
     cout << "Welcome to the shop! Enter" << endl;
-    cout << "[1] Buy food" << endl;
-    cout << "[2] Quit" << endl;
+    cout << "[" << GREEN << "1" << RESET << "] Buy Food" << endl;
+    cout << "[" << GREEN << "2" << RESET << "] Quit" << endl;
 
     int choice;
     cin >> choice;
@@ -226,7 +239,7 @@ void Shop(){
                 if (Money >= totalPrice) {
                     Money -= totalPrice;
                     Food += quantity;
-                    cout << "You bought " << quantity << " food for " << totalPrice << " money." << endl;
+                    cout << "You bought " << YELLOW << quantity << RESET << " food for " << GREEN << totalPrice << RESET << " money." << endl;
                 } else {
                     cout << "You don't have enough money to buy that many food." << endl;
                 }
@@ -251,7 +264,7 @@ void MiningLevelUp() {
         MiningLevel += 1;
         MiningXp -= MiningXpNeeded;
         MiningXpNeeded *= 1.2;
-        cout << "Congratulations! You leveled up Mining to Level " << MiningLevel << "!" << endl;
+        cout << GREEN << "Congratulations!" << RESET << " You leveled up Mining to Level " << YELLOW << MiningLevel << RESET << "!" << endl;
         cout << "XP needed for next level: " << MiningXpNeeded << endl;
     }
 
@@ -261,14 +274,14 @@ void processCommand(const string& command, Player& player) {
     // Process different commands
     if (command == "Help") {
         cout << "Basic commands:" << endl;
-        cout << "[*] Eat" << endl;
-        cout << "[*] Mine" << endl;
-        cout << "[*] Sleep" << endl;
-        cout << "[*] Sell" << endl;
-        cout << "[*] Info" << endl;
-        cout << "[*] Inventory" << endl;
-        cout << "[*] Shop" << endl;
-        cout << "[*] Cls" << endl;
+        cout << "[" << GREEN << "*" << RESET << "] Eat" << endl;
+        cout << "[" << GREEN << "*" << RESET << "] Mine" << endl;
+        cout << "[" << GREEN << "*" << RESET << "] Sleep" << endl;
+        cout << "[" << GREEN << "*" << RESET << "] Sell" << endl;
+        cout << "[" << GREEN << "*" << RESET << "] Info" << endl;
+        cout << "[" << GREEN << "*" << RESET << "] Inventory" << endl;
+        cout << "[" << GREEN << "*" << RESET << "] Shop" << endl;
+        cout << "[" << GREEN << "*" << RESET << "] Cls" << endl;
         // Add code to handle the 'help' command
     } else if (command == "Quit") {
         cout << "Quit command executed. Exiting program." << endl;
